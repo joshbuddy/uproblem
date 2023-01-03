@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"reflect"
@@ -595,6 +596,11 @@ func (t *TypeScriptify) convertType(depth int, typeOf reflect.Type, customCode m
 	t.alreadyConverted[typeOf.String()] = true
 
 	entityName := t.Prefix + typeOf.Name() + t.Suffix
+
+	if typeClashWithReservedKeyword(entityName) {
+		warnAboutTypesClash(entityName)
+	}
+
 	result := ""
 	if t.CreateInterface {
 		result += fmt.Sprintf("interface %s {\n", entityName)
@@ -635,13 +641,19 @@ func (t *TypeScriptify) convertType(depth int, typeOf reflect.Type, customCode m
 			err = builder.AddSimpleField(jsonFieldName, field, fldOpts)
 		} else if field.Type.Kind() == reflect.Struct { // Struct:
 			t.logf(depth, "- struct %s.%s (%s)", typeOf.Name(), field.Name, field.Type.String())
-			typeScriptChunk, err := t.convertType(depth+1, field.Type, customCode)
-			if err != nil {
-				return "", err
+
+			// Anonymous structures is ignored
+			// It is possible to generate them but hard to generate correct name
+			if field.Type.Name() != "" {
+				typeScriptChunk, err := t.convertType(depth+1, field.Type, customCode)
+				if err != nil {
+					return "", err
+				}
+				if typeScriptChunk != "" {
+					result = typeScriptChunk + "\n" + result
+				}
 			}
-			if typeScriptChunk != "" {
-				result = typeScriptChunk + "\n" + result
-			}
+
 			isKnownType := t.KnownStructs.Contains(getStructFQN(field.Type.String()))
 			println("KnownStructs:", t.KnownStructs.Join("\t"))
 			println(getStructFQN(field.Type.String()))
@@ -827,16 +839,24 @@ func (t *typeScriptClassBuilder) AddEnumField(fieldName string, field reflect.St
 
 func (t *typeScriptClassBuilder) AddStructField(fieldName string, field reflect.StructField, isAnyType bool) {
 	strippedFieldName := strings.ReplaceAll(fieldName, "?", "")
-	namespace := strings.Split(field.Type.String(), ".")[0]
-	fqname := "any"
+	fqname := field.Type.Name()
 	classname := "null"
-	fqname = field.Type.Name()
+
+	namespace := strings.Split(field.Type.String(), ".")[0]
+
 	if namespace != t.namespace {
 		fqname = field.Type.String()
 	}
+
 	if !isAnyType {
 		classname = fqname
 	}
+
+	// Anonymous struct
+	if field.Type.Name() == "" {
+		classname = "Object"
+	}
+
 	t.addField(fieldName, fqname, isAnyType)
 	t.addInitializerFieldLine(strippedFieldName, fmt.Sprintf("this.convertValues(source[\"%s\"], %s)", strippedFieldName, classname))
 }
@@ -900,4 +920,22 @@ func differentNamespaces(namespace string, typeOf reflect.Type) bool {
 		}
 	}
 	return false
+}
+
+func typeClashWithReservedKeyword(input string) bool {
+	in := strings.ToLower(strings.TrimSpace(input))
+	for _, v := range jsReservedKeywords {
+		if in == v {
+			return true
+		}
+	}
+
+	return false
+}
+
+func warnAboutTypesClash(entity string) {
+	// TODO: Refactor logging
+	l := log.New(os.Stderr, "", 0)
+	l.Println(fmt.Sprintf("Usage of reserved keyword found and not supported: %s", entity))
+	log.Println("Please rename returned type or consider adding bindings config to your wails.json")
 }
