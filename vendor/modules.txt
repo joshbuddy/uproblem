@@ -1,9 +1,15 @@
 # github.com/bep/debounce v1.2.1
 ## explicit
 github.com/bep/debounce
+# github.com/davecgh/go-spew v1.1.1
+## explicit
+github.com/davecgh/go-spew/spew
 # github.com/go-ole/go-ole v1.2.6
 ## explicit; go 1.12
 github.com/go-ole/go-ole
+# github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
+## explicit
+github.com/golang/glog
 # github.com/google/uuid v1.3.0
 ## explicit
 github.com/google/uuid
@@ -41,6 +47,17 @@ github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.17
 ## explicit; go 1.15
 github.com/mattn/go-isatty
+# github.com/otrego/clamshell v0.0.0-20220814024334-043dd78cf746
+## explicit; go 1.18
+github.com/otrego/clamshell/go/board
+github.com/otrego/clamshell/go/color
+github.com/otrego/clamshell/go/move
+github.com/otrego/clamshell/go/movetree
+github.com/otrego/clamshell/go/point
+github.com/otrego/clamshell/go/prop
+github.com/otrego/clamshell/go/sgf
+github.com/otrego/clamshell/katago
+github.com/otrego/clamshell/katago/kataprob
 # github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 ## explicit; go 1.14
 github.com/pkg/browser
