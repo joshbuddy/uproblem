@@ -47,14 +47,16 @@ func tryThing() error {
 
 	spew.Dump(paths)
 
-	blunderNodes := Map(paths, func(p movetree.Path) movetree.Node { return *p.Apply(g.Root)})
+	blunderNodes := Map(paths, func(p movetree.Path) movetree.Node { return *p.Apply(g.Root) })
 
 	sort.Slice(blunderNodes, func(i, j int) bool {
 		iDelta := scoreDelta(blunderNodes[i])
 		jDelta := scoreDelta(blunderNodes[j])
 		return iDelta > jDelta
 	})
-	fmt.Printf("Blunder nodes %#v\n", blunderNodes)
+	for i := 0; i != 3; i++ {
+		spew.Dump(blunderNodes[i].MoveNum())
+	}
 
 	return nil
 }
@@ -62,13 +64,17 @@ func tryThing() error {
 func Map[T, V any](ts []T, fn func(T) V) []V {
 	result := make([]V, len(ts))
 	for i, t := range ts {
-			result[i] = fn(t)
+		result[i] = fn(t)
 	}
 	return result
 }
 
-func scoreDelta (n movetree.Node) float64 {
-	nScoreLead := n.AnalysisData().(*katago.AnalysisResult).MoveInfos[0].ScoreLead
-	pScoreLead := n.Parent.AnalysisData().(*katago.AnalysisResult).MoveInfos[0].ScoreLead
+func scoreDelta(n movetree.Node) float64 {
+	// fmt.Printf("n.AnalysisData().(*katago.AnalysisResult).MoveInfos[0].ScoreLead: %f, n.AnalysisData().(*katago.AnalysisResult).RootInfo.ScoreLead %f\n",
+	// 	n.AnalysisData().(*katago.AnalysisResult).MoveInfos[0].ScoreLead,
+	// 	n.AnalysisData().(*katago.AnalysisResult).RootInfo.ScoreLead)
+	nScoreLead := n.AnalysisData().(*katago.AnalysisResult).RootInfo.ScoreLead
+	pScoreLead := n.Parent.AnalysisData().(*katago.AnalysisResult).RootInfo.ScoreLead
+	fmt.Printf("%d: nScoreLead %f pScoreLead %f -> %f\n", n.MoveNum(), nScoreLead, pScoreLead, nScoreLead-pScoreLead)
 	return nScoreLead - pScoreLead
 }

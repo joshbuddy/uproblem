@@ -4,6 +4,7 @@
 package kataprob
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/golang/glog"
@@ -50,10 +51,12 @@ func FindBlunders(g *movetree.MoveTree) ([]movetree.Path, error) {
 		}
 
 		lead := katad.RootInfo.ScoreLead
-		nextLead := -1 * lead
-		glog.V(3).Infof("Next ScoreLead: %v:", nextLead)
+		var nextLead float64
+		//if
+		nextLead = -1 * lead
+		//glog.V(3).Infof("Next ScoreLead: %f:\n", nextLead)
 		delta := nextLead - pl
-		glog.V(3).Infof("Delta: %v:", delta)
+		fmt.Printf("%d nextLead: %f Delta: %f katad.RootInfo.ScoreLead: %f\n", n.MoveNum(), nextLead, delta, katad.RootInfo.ScoreLead)
 
 		if delta >= math.Abs(blunderAmt) {
 			found = append(found, cur.Clone())
