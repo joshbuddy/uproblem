@@ -2,11 +2,16 @@ module uproblem
 
 go 1.19
 
-require github.com/wailsapp/wails/v2 v2.3.1
+require (
+	github.com/davecgh/go-spew v1.1.1
+	github.com/otrego/clamshell v0.0.0-20220814024334-043dd78cf746
+	github.com/wailsapp/wails/v2 v2.3.1
+)
 
 require (
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect

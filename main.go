@@ -2,6 +2,8 @@ package main
 
 import (
 	"embed"
+	"flag"
+	"fmt"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -12,11 +14,16 @@ import (
 var assets embed.FS
 
 func main() {
+	flag.Parse()
+	err := tryThing()
+	if err != nil {
+		fmt.Printf("err! %#v", err)
+	}
 	// Create an instance of the app structure
 	app := NewApp()
 
 	// Create application with options
-	err := wails.Run(&options.App{
+	err = wails.Run(&options.App{
 		Title:  "uproblem",
 		Width:  1024,
 		Height: 768,
